@@ -4,6 +4,10 @@ import cv2.data as datadir
 
 print(datadir.haarcascades+'haarcascade_mcs_nose.xml')
 
+good = 0
+wrong = 0
+no = 0
+noface = 0
 
 nose_cascade = cv2.CascadeClassifier(datadir.haarcascades+'haarcascade_mcs_nose.xml')
 if nose_cascade.empty():
@@ -20,6 +24,8 @@ for img in imglist:
     input_dict = {"data": [frame]}
     results = module.face_detection(data = input_dict)
     print(results)
+    if len(results) == 0:
+        noface = noface + 1
     for r in results:
         lf = int(r['data']['left'])
         rt = int(r['data']['right'])
@@ -37,6 +43,7 @@ for img in imglist:
                 cv2.rectangle(frame, (lf, top), (rt, bottom), (0, 255, 0), 3)
                 cv2.putText(frame, r['data']['label'], (lf - 50, top - 20), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0),
                             2)
+                good = good + 1
             else:
                 # for (x_nose, y_nose, w_nose, h_nose) in nose_rects:
                 #     cv2.rectangle(frame, (lf + x_nose, top + y_nose), (lf + x_nose + w_nose,top + y_nose + h_nose),
@@ -44,11 +51,14 @@ for img in imglist:
                 cv2.rectangle(frame, (lf, top), (rt, bottom), (0, 255, 255), 3)
                 cv2.putText(frame, 'Wrong', (lf - 50, top - 20), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 255),
                             2)
+                wrong = wrong + 1
         else:
             cv2.rectangle(frame, (lf, top), (rt, bottom), (0, 0, 255), 3)
             cv2.putText(frame, r['data']['label'], (lf - 50, top - 20), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 2)
+            no = no + 1
+    print('good: ', good, ' wrong: ', wrong, ' no: ', no)
         # break
-        cv2.imwrite(os.path.join('./imgaftertest', img), frame)
+    cv2.imwrite(os.path.join('./imgaftertest2', img), frame)
 
     # cv2.imshow('face', frame)
 
